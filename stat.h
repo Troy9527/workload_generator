@@ -41,9 +41,26 @@ void cpu_stat(){
 }
 
 void mem_stat(){
-	FILE *proc;
+	FILE 			*proc;
+	char 			*buffer = (char*)malloc(SIZE*sizeof(char));	
+	unsigned long long 	total, free_mem;	
 	proc = fopen("/proc/stat", "r");
-		
+	
+	/*read data*/
+	memset(buffer, 0, SIZE);
+	fgets(buffer,1000,proc);
+
+	sscanf(buffer, "MemTotal: %llu", &total);
+	
+	memset(buffer, 0, SIZE);
+	fgets(buffer,1000,proc);
+
+	sscanf(buffer, "MemFree: %llu", &free_mem);
+
+	printf("%llu %llu\n", total, free_mem);
+
+	fclose(proc);
+	free(buffer);
 }
 
 void io_stat(){

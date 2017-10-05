@@ -8,7 +8,7 @@
 
 struct 	timespec start;
 int 	*pid;
-double 	load;
+double 	load, mem_load, io_load;
 
 /*signal handler*/
 void sigusr_handler(void){
