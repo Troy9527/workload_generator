@@ -2,6 +2,8 @@
 #include <signal.h>
 #include <sched.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "timer.h"
 #include "stat.h"
@@ -71,6 +73,9 @@ int main(int argc, char* argv[]){
 	/*start generate workload*/
 	int i;
 	pid = (int*)malloc(cpu_count*sizeof(int));	
+
+	int ret = setpriority(PRIO_PROCESS, 0, -20);
+	/*printf("ret: %d\n", ret);*/
 
 	/*create child process*/
 	for(i=0; i<cpu_count; i++){
