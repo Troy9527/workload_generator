@@ -8,23 +8,38 @@
 
 struct timespec start;
 double load;
+int *pid;
 
 static void usage(){
 	printf("Hello");
 }
 
 /*signal handler*/
-void sigterm_handler(void){
+void sigusr_handler(void){
 	struct timespec end;
 	clock_gettime(CLOCK_REALTIME, &end);
 	/*printf("%d %d %ld %ld\n", start.tv_sec, end.tv_sec, start.tv_nsec, end.tv_nsec);*/
 	double work = diff_in_second(start,end);
 	double idle = (work*(1.0-load))/load;
-	printf("%lf %lf\n", work, idle);
+	/*printf("%lf %lf\n", work, idle);*/
 
 	usleep((int)idle);	
-	exit(0);
+	
+	clock_gettime(CLOCK_REALTIME, &start);
+}
 
+void sigterm_handler(void){
+	int i;
+	for(i=0; i<(sizeof(pid)/sizeof(int)); i++){
+		kill(pid[i], SIGUSR2);
+	}
+	
+	exit(0);
+}	
+
+void exit_handler(void){
+	printf("exit\n");
+	exit(0);
 }
 
 int main(int argc, char* argv[]){
@@ -49,31 +64,37 @@ int main(int argc, char* argv[]){
 	printf("Find %d CPU cores\n", cpu_count);
 
 	/*registrate handler*/
-	signal(SIGTERM, (__sighandler_t)sigterm_handler);
+	signal(SIGUSR1, (__sighandler_t)sigusr_handler);
+	signal(SIGUSR2, (__sighandler_t)exit_handler);
 
 	/*cpu_count = 1;*/
 	/*start generate workload*/
-	int i, pid[cpu_count];
+	int i;
+	pid = (int*)malloc(cpu_count*sizeof(int));	
 
-	/*while(1){*/
-		/*create child process*/
-		for(i=0; i<cpu_count; i++){
-			pid[i] = fork();
-			
-			/*child process*/
-			if(pid[i] == 0){
-				clock_gettime(CLOCK_REALTIME, &start);
-				while(1){
-				}
+	/*create child process*/
+	for(i=0; i<cpu_count; i++){
+		pid[i] = fork();
+		
+		/*child process*/
+		if(pid[i] == 0){
+			clock_gettime(CLOCK_REALTIME, &start);
+			while(1){
 			}
 		}
+	}
+
+	signal(SIGTERM, (__sighandler_t)sigterm_handler);
+
+	while(1){
 
 		usleep(50000);
 		for(i=0; i<cpu_count; i++){
-			kill(pid[i], SIGTERM);
+			kill(pid[i], SIGUSR1);
 		}
-		
-	/*}*/
+		cpu_stat();	
+	}
 
-
+	free(pid);
+	return 0;
 }
