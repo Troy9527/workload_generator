@@ -33,12 +33,19 @@ void cpu_stat(){
 	unsigned long long t1,t2;
 	t1 = (idle2-idle1) > 0 ? idle2-idle1 : idle1-idle2;
 	t2 = (total2-total1) > 0 ? total2-total1 : total1-total2;
-	/*printf("%llu %llu %llu %llu\n", idle1, total1, idle2, total2);*/
-	/*printf("%llu %llu\n", t1, t2);*/
 
 	double load = 1.0 - ((double)t1/(double)t2);
-	/*double load = (abs(idle2-idle1)/abs(total2-total1));*/
 	printf("cpu load: %lf\n", load);
 	
 	free(buffer);
+}
+
+void mem_stat(){
+	FILE *proc;
+	proc = fopen("/proc/stat", "r");
+		
+}
+
+void io_stat(){
+	
 }

@@ -5,47 +5,16 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include "timer.h"
+#include "sighandler.h"
 #include "stat.h"
-
-struct timespec start;
-double load;
-int *pid;
 
 static void usage(){
 	printf("Hello");
 }
 
-/*signal handler*/
-void sigusr_handler(void){
-	struct timespec end;
-	clock_gettime(CLOCK_REALTIME, &end);
-	/*printf("%d %d %ld %ld\n", start.tv_sec, end.tv_sec, start.tv_nsec, end.tv_nsec);*/
-	double work = diff_in_second(start,end);
-	double idle = (work*(1.0-load))/load;
-	/*printf("%lf %lf\n", work, idle);*/
-
-	usleep((int)idle);	
-	
-	clock_gettime(CLOCK_REALTIME, &start);
-}
-
-void sigterm_handler(void){
-	int i;
-	for(i=0; i<(sizeof(pid)/sizeof(int)); i++){
-		kill(pid[i], SIGUSR2);
-	}
-	
-	exit(0);
-}	
-
-void exit_handler(void){
-	printf("exit\n");
-	exit(0);
-}
 
 int main(int argc, char* argv[]){
-	int cpu_count;
+	int cpu_count, i;
 
 	/*parsing arguments*/
 	if(argc == 1){
@@ -71,7 +40,6 @@ int main(int argc, char* argv[]){
 
 	/*cpu_count = 1;*/
 	/*start generate workload*/
-	int i;
 	pid = (int*)malloc(cpu_count*sizeof(int));	
 
 	int ret = setpriority(PRIO_PROCESS, 0, -20);
