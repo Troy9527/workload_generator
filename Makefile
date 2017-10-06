@@ -1,5 +1,5 @@
 all:
-	gcc -o cpu_load.out main.c
+	gcc -o cpu_load.out main.c -O2
 
 clean:
 	rm *.out
