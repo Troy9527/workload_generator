@@ -93,7 +93,7 @@ void ioloadgen(){
 	double			expect_kbs = io_max*io_load;
 	struct timespec		end;
 	int			i;
-	printf("Exprct kbs: %lfkB/s\nioloadgen: write %llu bytes in %d seconds\n", expect_kbs, bytes, io_time);
+	printf("Expect kbs: %lfkB/s\nioloadgen: write %llu bytes in %d seconds\n", expect_kbs, bytes, io_time);
 
 	/*create child process*/
 	for(i=0; i<1; i++){
