@@ -52,9 +52,6 @@ void cpuloadgen(){
 }
 
 void memloadgen(){
-	/*registrate handler*/
-	/*signal(SIGUSR1, (__sighandler_t)sigusr_mem_handler);*/
-	/*signal(SIGUSR2, (__sighandler_t)exit_mem_handler);*/
 
 	/*start generate workload*/
 	int	i, stride = 4096;
@@ -80,6 +77,64 @@ void memloadgen(){
 		usleep(50000);
 		/*mem_stat();	*/
 	}
+
+}
+
+void ioloadgen(){
+	/*registrate handler*/
+	signal(SIGUSR2, (__sighandler_t)exit_io_handler);
+	/*signal(SIGUSR1, (__sighandler_t)sigusr_handler);*/
+
+	/*start generate workload*/
+	pid = (int*)malloc(1*sizeof(int));	
+
+	int			io_time = 1;
+	unsigned long long	bytes = io_time*io_max*io_load*1024;
+	double			expect_kbs = io_max*io_load;
+	struct timespec		end;
+	int			i;
+	printf("Exprct kbs: %lfkB/s\nioloadgen: write %llu bytes in %d seconds\n", expect_kbs, bytes, io_time);
+
+	/*create child process*/
+	for(i=0; i<1; i++){
+		pid[i] = fork();
+		
+		/*child process*/
+		if(pid[i] == 0){
+			while(1){
+				file = fopen("/home/troy/tmp", "w");
+				if(file == NULL) fprintf(stderr, "io: create temp file failed\n");
+				io_buffer = (char*)malloc(bytes*sizeof(char));
+
+				/*start write to disk*/
+				clock_gettime(CLOCK_REALTIME, &start);
+					write(fileno(file), io_buffer, bytes);
+					sync();
+				clock_gettime(CLOCK_REALTIME, &end);
+				double 	write_time = diff_in_second(start, end);
+				printf("write second: %lf\n", write_time);				
+				if(write_time > io_time*1000000){
+					fprintf(stderr, "write time is too long\n");
+					exit(0);
+				}
+
+				int	sleep_time = (io_time*1000000 - write_time);
+				printf("sleep second: %d\n", sleep_time);				
+				usleep(sleep_time);
+
+				free(io_buffer);
+				fclose(file);
+			}
+		}
+	}
+
+	signal(SIGTERM, (__sighandler_t)sigterm_io_handler);
+
+	while(1){
+		io_stat();	
+	}
+
+	free(pid);
 
 }
 
@@ -109,7 +164,8 @@ int main(int argc, char* argv[]){
 				case 'i':
 					sscanf(argv[i+1],"%lf", &io_load);
 					io_load = io_load/100.0;
-					i += 2;
+					sscanf(argv[i+2],"%lf", &io_max);
+					i += 3;
 					do_io = 1;
 					break;
 
@@ -137,7 +193,7 @@ int main(int argc, char* argv[]){
 	}
 
 	if(do_io){
-		
+		ioloadgen();		
 	}
 
 	return 0;

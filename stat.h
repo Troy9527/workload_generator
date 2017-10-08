@@ -1,3 +1,6 @@
+#ifndef __STAT_H
+#define __STAT_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #define SIZE 3000
@@ -90,5 +93,65 @@ void mem_get(unsigned long long *total, unsigned long long *free_mem){
 }	
 
 void io_stat(){
-	
+	FILE 	*proc = fopen("/proc/diskstats", "r");
+	char 	*buffer = (char*)malloc(SIZE*sizeof(char));	
+	char	*name = (char*)malloc(30*sizeof(char));
+	unsigned long long 	read_sec1, write_sec1, read_sec2, write_sec2;
+	double	read_diff, write_diff;
+	int time = 5;
+
+	/*sample at time (1)*/
+	if(proc == NULL)
+		fprintf(stderr, "open /proc/diskstats fialed\n");
+
+	while(fgets(buffer, 200, proc) != NULL){
+		/*read major&minor number*/
+		sscanf(buffer, "%llu %llu", &read_sec1, &write_sec1);
+		/*printf("%s", buffer);*/
+
+		if(read_sec1 == 8 && write_sec1 == 0){
+			/*sscanf(buffer ,"%*[0-9] %*[0-9] %*[^0-9] %d", &a);*/
+			sscanf(buffer ,"%*llu %*llu %s %*llu %*llu %llu %*llu %*llu %*llu %llu", name, &read_sec1, &write_sec1);
+			/*printf("%s ", name);*/
+			/*printf("%llu %llu\n", read_sec1, write_sec1);*/
+			break;
+		}
+	}
+	memset(buffer, 0, SIZE);
+	memset(name, 0, 30);
+	fclose(proc);
+
+	sleep(time);
+	printf("time2\n");
+
+	/*sample at time (1)*/
+	proc = fopen("/proc/diskstats", "r");
+	if(proc == NULL)
+		fprintf(stderr, "open /proc/diskstats fialed\n");
+
+	while(fgets(buffer, 200, proc) != NULL){
+		sscanf(buffer, "%llu %llu", &read_sec2, &write_sec2);
+		/*printf("%s", buffer);*/
+
+		if(read_sec2 == 8 && write_sec2 == 0){
+			sscanf(buffer ,"%*llu %*llu %s %*llu %*llu %llu %*llu %*llu %*llu %llu", name, &read_sec2, &write_sec2);
+			/*printf("%s\t", name);*/
+			/*printf("%llu %llu\n", read_sec2, write_sec2);*/
+			break;
+		}
+	}
+	memset(buffer, 0, SIZE);
+	memset(name, 0, 30);
+	fclose(proc);
+
+	write_diff = ((write_sec2 - write_sec1)/2.0)/(double)time;
+	read_diff = ((read_sec2 - read_sec1)/2.0)/(double)time;
+
+	printf("read: %lfkB/s\nwrite: %lfkB/s\n", read_diff, write_diff);
+
+
+	free(buffer);
+	free(name);
 }
+
+#endif

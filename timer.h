@@ -11,6 +11,9 @@
 	/*return ret;*/
 /*}*/
 
+#ifndef __TIMER_H
+#define __TIMER_H
+
 #include <time.h>
 
 static double diff_in_second(struct timespec t1, struct timespec t2)
@@ -26,3 +29,4 @@ static double diff_in_second(struct timespec t1, struct timespec t2)
     return (diff.tv_sec*1000000 + diff.tv_nsec / 1000.0);
 }
 
+#endif

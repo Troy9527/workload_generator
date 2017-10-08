@@ -1,3 +1,6 @@
+#ifndef __SIGHANDLER_H
+#define __SIGHANDLER_H
+
 #define _GNU_SOURCE
 #include <signal.h>
 #include <unistd.h>
@@ -11,10 +14,11 @@
 
 struct 	timespec start;
 int 	*pid;
-double 	load, mem_load, io_load;
+double 	load, mem_load, io_load, io_max;
 int 	cpu_count;
 unsigned long long	size;
-char	*temp;
+char	*temp, *io_buffer;
+FILE	*file;
 
 /*signal handler*/
 void sigusr_handler(void){
@@ -56,6 +60,13 @@ void sigterm_handler(void){
 	exit(0);
 }	
 
+void sigterm_io_handler(void){
+	kill(pid[0], SIGUSR2);
+	
+	free(pid);
+	exit(0);
+}	
+
 void sigterm_mem_handler(void){
 	/*int i;*/
 	/*for(i=0; i<mem_count; i++){*/
@@ -71,6 +82,13 @@ void exit_handler(void){
 	exit(0);
 }
 
+void exit_io_handler(void){
+	printf("exit\n");
+	fclose(file);
+	free(io_buffer);
+	exit(0);
+}
+
 /*void exit_mem_handler(void){*/
 	/*printf("exit\n");*/
 	/*shmdt(share);*/
@@ -79,3 +97,4 @@ void exit_handler(void){
 	/*exit(0);*/
 /*}*/
 
+#endif
