@@ -111,8 +111,11 @@ void ioloadgen(){
 					write(fileno(file), io_buffer, bytes);
 					sync();
 				clock_gettime(CLOCK_REALTIME, &end);
+				
 				double 	write_time = diff_in_second(start, end);
 				printf("write second: %lf\n", write_time);				
+				
+				/* check write time*/
 				if(write_time > io_time*1000000){
 					fprintf(stderr, "write time is too long\n");
 					exit(0);
