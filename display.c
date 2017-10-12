@@ -89,11 +89,21 @@ static void mem_stat(void){
 }
 
 static void dick(void){
-	int col, row;
+	int col, row, length, i;
 	getmaxyx(stdscr, row, col);
 	
 	init_pair(0, COLOR_RED, COLOR_YELLOW);
 	init_pair(1, COLOR_RED, COLOR_YELLOW);
 
-	mvprintw((row/4)*3, 3, "**********************************************");
+	length = 56*cpu_load;
+
+	mvprintw(52 - length, 190, "     *****     ");
+	mvprintw(53 - length, 190, "   **     **   ");
+	mvprintw(54 - length, 190, " **         ** ");
+	mvprintw(55 - length, 190, "**           **");
+	mvprintw(56 - length, 190, "**           **");
+	
+	for(i = 0 ; i<length ; i++){
+	mvprintw(56-i, 190, "  **       **");
+	}
 }
