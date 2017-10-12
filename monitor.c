@@ -45,6 +45,7 @@ int main(void){
 
 static void initial(void){	
 	initscr();		/* initial virtual screen */
+	start_color();		/* enable color */
 	keypad(stdscr, TRUE);	/* enable keyboard */
 	move(2, 2);		/* move cursor to (2,2) */
 	/*mvaddstr(3, 3, "hello world\n");*/
