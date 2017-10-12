@@ -8,12 +8,12 @@
 #include <ncurses.h>
 
 
-//#include "cpu.h"
+#include "cpu.h"
+#include "iodisk.h"
 
 /*extern double cpu_load;*/
 
 void* display(void* none);
 
-void exit_handler(void* none);
 
 #endif

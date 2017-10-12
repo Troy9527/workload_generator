@@ -1,13 +1,14 @@
 MONITOR = monitor.out
 CC = gcc
 M_CFLAGS = \
-	   -Wall -O2 -pthread -lncurses
+	   -Wall -O2 -pthread -lncurses -Wno-format -g
 
 LDFLAGS = \
 	  -lm -pthread -lncurses
 OBJS = \
 	display.o \
 	cpu.o \
+	iodisk.o \
 	monitor.o
 
 %.o: %.c
@@ -22,8 +23,8 @@ monitor: $(OBJS)
 	$(CC) -o $(MONITOR) $^ $(LDFLAGS)
 
 clean:
-	rm *.o
-	rm -f *.out
+	-rm *.o
+	-rm -f *.out
 
 run:
 	make clean

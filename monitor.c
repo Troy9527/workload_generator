@@ -31,8 +31,8 @@ int main(void){
 				break;
 			case 113:
 				pthread_cancel(display_thread);
-				/*endwin();*/
-				/*exit(1);*/
+				endwin();
+				exit(1);
 				break;
 		}
 		
@@ -47,5 +47,5 @@ static void initial(void){
 	initscr();		/* initial virtual screen */
 	keypad(stdscr, TRUE);	/* enable keyboard */
 	move(2, 2);		/* move cursor to (2,2) */
-	mvaddstr(3, 3, "hello world\n");
+	/*mvaddstr(3, 3, "hello world\n");*/
 }
