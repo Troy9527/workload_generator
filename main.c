@@ -15,7 +15,12 @@
 
 
 static void usage(){
-	printf("Hello");
+	printf("usage: workload [-c cpu_usage] [-m mem_usage] [-i io_usage io_max_speed]\n"
+	       "  options:\n"
+	       "    -c cpu_usage\t\tstress the utilization of CPU to cpu_usage\n"
+	       "    -m mem_usage\t\tstress the utilization of memory to mem_usage\n"
+	       "    -i io_usage io_max_speed\tstress the utilization of disk io to io_usage according to io_max_speed\n"		
+	       );
 }
 
 
@@ -30,26 +35,58 @@ int main(int argc, char* argv[]){
 	}
 	else{
 		while(i < argc){
-			switch(argv[i][0]){
+			switch(argv[i][1]){
 				case 'c':
-					sscanf(argv[i+1],"%lf", &load);
+					if(argv[i+1] != NULL){
+						sscanf(argv[i+1],"%lf", &load);
+					}
+					else{
+						usage();
+						return 0;
+					}
+					
 					load = load/100.0;
 					i += 2;
 					do_cpu = 1;
 					break;
 				case 'm':
-					sscanf(argv[i+1],"%lf", &mem_load);
+					if(argv[i+1] != NULL){
+						sscanf(argv[i+1],"%lf", &mem_load);
+					}
+					else{
+						usage();
+						return 0;
+					}
+
 					mem_load = mem_load/100.0;
 					i += 2;
 					do_mem = 1;
 					break;
 				case 'i':
-					sscanf(argv[i+1],"%lf", &io_load);
+					if(argv[i+1] != NULL){
+						sscanf(argv[i+1],"%lf", &io_load);
+					}
+					else{
+						usage();
+						return 0;
+					}
+					
+					if(argv[i+2] != NULL){
+						sscanf(argv[i+2],"%lf", &io_max);
+					}
+					else{
+						usage();
+						return 0;
+					}
+
+					
 					io_load = io_load/100.0;
-					sscanf(argv[i+2],"%lf", &io_max);
 					i += 3;
 					do_io = 1;
 					break;
+				default:
+					usage();
+					return 0;
 
 			}
 		}
