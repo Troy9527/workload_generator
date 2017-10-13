@@ -42,7 +42,7 @@ void* display(void* none){
 		dick();
 
 		refresh();
-		usleep(1000000);
+		usleep(1200000);
 	}
 	pthread_cleanup_pop(0);
 	return NULL;

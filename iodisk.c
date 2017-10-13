@@ -60,14 +60,15 @@ void read_disk(int time){
 
 	time /= 1000000;
 	io_file = fopen("/proc/diskstats", "r");
-	
 	if(io_file == NULL)
 		fprintf(stderr, "io_stat: fopen failed\n");
+
 
 	while(fgets(io_buffer, buffer_size, io_file) != NULL){
 		sscanf(io_buffer, "%d %d %s %*llu %*llu %llu %*llu %*llu %*llu %llu"
 				, &major, &minor, name, &read_sec, &write_sec);
-
+		
+		/* find whole disk information */
 		if(major == 8 && (minor % 16) ==0){
 			struct iodisk *node = search_disk(major, minor);
 			if(node == NULL){  /* not found, need append to disk */

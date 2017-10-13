@@ -1,25 +1,36 @@
 MONITOR = monitor.out
+WORKLOAD = workload.out
+
 CC = gcc
-M_CFLAGS = \
-	   -Wall -O2 -pthread -lncurses -Wno-format -g
+
+CFLAGS = \
+	   -Wall -O2 -pthread -lncurses -Wno-format
 
 LDFLAGS = \
 	  -lm -pthread -lncurses
-OBJS = \
+M_OBJS := \
 	display.o \
 	cpu.o \
 	iodisk.o \
 	monitor.o
 
+OBJS := \
+	main.o \
+	sighandler.o \
+	cpuload.o \
+	memload.o \
+	ioload.o \
+	timer.o
+
 %.o: %.c
-	$(CC) $(M_CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 
+load: $(OBJS)
+	$(CC) -o $(WORKLOAD) $^ $(LDFLAGS)
 
-all:
-	gcc -o cpu_load.out main.c -O2 -Wall
 
-monitor: $(OBJS)
+monitor: $(M_OBJS)
 	$(CC) -o $(MONITOR) $^ $(LDFLAGS)
 
 clean:
@@ -28,7 +39,7 @@ clean:
 
 run:
 	make clean
-	make all
-	./cpu_load.out
+	make monitor
+	./monitor.out
 
 
