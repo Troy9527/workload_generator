@@ -1,11 +1,7 @@
 #include <unistd.h>
 #include <signal.h>
-#include <sched.h>
 #include <string.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-
-#include <sys/mman.h>
+#include <sys/types.h>
 
 #include "cpuload.h"
 #include "memload.h"
@@ -26,7 +22,7 @@ static void usage(){
 
 
 int main(int argc, char* argv[]){
-	int i=1, do_cpu=0, do_mem=0, do_io=0;
+	int i=1;
 
 	/*parsing arguments*/
 	if(argc == 1){
@@ -100,20 +96,39 @@ int main(int argc, char* argv[]){
 		fprintf(stderr, "Error: could not determine CPU cores count\n");
 		return cpu_count;
 	}
+
+	printf("PID: %d\n", getpid());
 	printf("Find %d CPU cores\n", cpu_count);
 
 	/*generate load*/
 	if(do_cpu){
 		cpuloadgen();
 	}	
+
+	if(do_io){
+		ioloadgen();		
+	}
 	
 	if(do_mem){
 		memloadgen();
 	}
 
-	if(do_io){
-		ioloadgen();		
+	/* wait exit signal and do cpuloadgen */
+	signal(SIGINT, (__sighandler_t)sigterm_handler);
+	signal(SIGTERM, (__sighandler_t)sigterm_handler);
+	signal(SIGTSTP, (__sighandler_t)sigterm_handler);
+
+
+	if(do_cpu){
+		while(1){
+			usleep(50000);
+			for(i=0; i<cpu_count; i++){
+				kill(pid[i], SIGUSR1);
+			}
+		}
 	}
+
+	pause();
 
 	return 0;
 }

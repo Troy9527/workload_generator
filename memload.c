@@ -12,9 +12,7 @@ void memloadgen(){
 	mem_get(&total, &free_mem);
 	use = (total*mem_load);  // kB
 
-	printf("use: %llu\n", use);
-
-	signal(SIGTERM, (__sighandler_t)sigterm_mem_handler);
+	/*signal(SIGTERM, (__sighandler_t)sigterm_mem_handler);*/
 
 	mem_size = use*1024;
 	mem_buffer = (char *)malloc(mem_size);
@@ -26,13 +24,8 @@ void memloadgen(){
 	for(j=0 ; j < mem_size; j+=stride) 
 		mem_buffer[j] = 'z';
 	
-	printf("%llu\n", mem_size);
+	printf("memloadgen: %llu bytes\n", mem_size);
 	mlock(mem_buffer, mem_size);
-
-	
-	while(1){
-		usleep(50000);
-	}
 
 }
 

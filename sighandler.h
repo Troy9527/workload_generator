@@ -13,9 +13,9 @@
 
 
 extern struct timespec 	start;
-extern int 		*pid;
+extern int 		*pid, *io_pid;
 extern double 		load, mem_load, io_load, io_max;
-extern int 		cpu_count;
+extern int 		cpu_count, do_cpu, do_mem, do_io;
 extern unsigned long long	mem_size;
 extern char		*mem_buffer, *io_buffer;
 extern FILE		*file;
@@ -24,8 +24,6 @@ extern FILE		*file;
 void sigusr_handler(void);
 
 void sigterm_handler(void);
-void sigterm_io_handler(void);
-void sigterm_mem_handler(void);
 
 void exit_handler(void);
 void exit_io_handler(void);

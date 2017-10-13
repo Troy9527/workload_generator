@@ -8,8 +8,10 @@ void cpuloadgen(void){
 	/*start generate workload*/
 	pid = (int*)malloc(cpu_count*sizeof(int));	
 
-	int i, ret = setpriority(PRIO_PROCESS, 0, -20);
-	/*printf("ret: %d\n", ret);*/
+	int i;
+
+	/* set nice value */
+	setpriority(PRIO_PROCESS, 0, -20);
 
 	/*create child process*/
 	for(i=0; i<cpu_count; i++){
@@ -23,15 +25,4 @@ void cpuloadgen(void){
 		}
 	}
 
-	signal(SIGTERM, (__sighandler_t)sigterm_handler);
-
-	while(1){
-
-		usleep(50000);
-		for(i=0; i<cpu_count; i++){
-			kill(pid[i], SIGUSR1);
-		}
-	}
-
-	free(pid);
 }

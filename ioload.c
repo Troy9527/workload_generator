@@ -3,25 +3,24 @@
 
 void ioloadgen(){
 	/*registrate handler*/
-	signal(SIGUSR2, (__sighandler_t)exit_io_handler);
 	/*signal(SIGUSR1, (__sighandler_t)sigusr_handler);*/
 
 	/*start generate workload*/
-	pid = (int*)malloc(1*sizeof(int));	
+	io_pid = (int*)malloc(1*sizeof(int));	
 
 	int			io_time = 1;
 	unsigned long long	bytes = io_time*io_max*io_load*1024;
 	double			expect_kbs = io_max*io_load;
 	struct timespec		end;
 	int			i;
-	printf("Expect kbs: %lfkB/s\nioloadgen: write %llu bytes in %d seconds\n", expect_kbs, bytes, io_time);
+	printf("ioloadgen: write %llu bytes in %d seconds\n", expect_kbs, bytes, io_time);
 
 	/*create child process*/
 	for(i=0; i<1; i++){
-		pid[i] = fork();
-		
+		*io_pid = fork();
 		/*child process*/
-		if(pid[i] == 0){
+		if(*io_pid == 0){
+			signal(SIGUSR2, (__sighandler_t)exit_io_handler);
 			while(1){
 				file = fopen("/home/troy/tmp", "w");
 				if(file == NULL) fprintf(stderr, "io: create temp file failed\n");
@@ -38,7 +37,7 @@ void ioloadgen(){
 				
 				/* check write time*/
 				if(write_time > io_time*1000000){
-					fprintf(stderr, "write time is too long\n");
+					fprintf(stderr, "writing time is too long\n");
 					exit(0);
 				}
 
@@ -52,9 +51,6 @@ void ioloadgen(){
 		}
 	}
 
-	signal(SIGTERM, (__sighandler_t)sigterm_io_handler);
-
-	pause();
-	free(pid);
+	/*signal(SIGTERM, (__sighandler_t)sigterm_io_handler);*/
 
 }
