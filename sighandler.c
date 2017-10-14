@@ -5,7 +5,7 @@ int 			*pid, *io_pid;
 double 			load, mem_load, io_load, io_max;
 int 			cpu_count, do_cpu=0, do_mem=0, do_io=0;
 unsigned long long	mem_size;
-char			*mem_buffer, *io_buffer;
+char			*mem_buffer, *io_buffer, *io_tempfile;
 FILE			*file;
 
 
@@ -41,6 +41,7 @@ void sigterm_handler(void){
 	if(do_io){
 		kill(*io_pid, SIGUSR2);
 		free(io_pid);
+		free(io_tempfile);
 	}
 	exit(0);
 }	
@@ -52,8 +53,9 @@ void exit_handler(void){
 }
 
 void exit_io_handler(void){
-	unlink("/home/troy/tmp");
+	unlink(io_tempfile);
 	fclose(file);
 	free(io_buffer);
+	free(io_tempfile);
 	exit(0);
 }

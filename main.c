@@ -11,11 +11,11 @@
 
 
 static void usage(){
-	printf("usage: workload [-c cpu_usage] [-m mem_usage] [-i io_usage io_max_speed]\n"
+	printf("usage: workload [-c cpu_usage] [-m mem_usage] [-i io_usage io_max_speed path_to_tempfile]\n"
 	       "  options:\n"
-	       "    -c cpu_usage\t\tstress the utilization of CPU to cpu_usage\n"
-	       "    -m mem_usage\t\tstress the utilization of memory to mem_usage\n"
-	       "    -i io_usage io_max_speed\tstress the utilization of disk io to io_usage according to io_max_speed\n"		
+	       "    -c cpu_usage\t\t\t\tstress the utilization of CPU to cpu_usage\n"
+	       "    -m mem_usage\t\t\t\tstress the utilization of memory to mem_usage\n"
+	       "    -i io_usage io_max_speed path_to_tempfile\tstress the utilization of disk io to io_usage according to io_max_speed\n"		
 	       );
 }
 
@@ -75,9 +75,18 @@ int main(int argc, char* argv[]){
 						return 0;
 					}
 
-					
+					io_tempfile = (char*)malloc(50*sizeof(char));
+					if(argv[i+3] != NULL){
+						strcpy(io_tempfile, argv[i+3]);
+					}
+					else{
+						usage();
+						return 0;
+					}
+
+
 					io_load = io_load/100.0;
-					i += 3;
+					i += 4;
 					do_io = 1;
 					break;
 				default:

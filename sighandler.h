@@ -17,7 +17,7 @@ extern int 		*pid, *io_pid;
 extern double 		load, mem_load, io_load, io_max;
 extern int 		cpu_count, do_cpu, do_mem, do_io;
 extern unsigned long long	mem_size;
-extern char		*mem_buffer, *io_buffer;
+extern char		*mem_buffer, *io_buffer, *io_tempfile;
 extern FILE		*file;
 
 

@@ -13,7 +13,16 @@ void ioloadgen(){
 	double			expect_kbs = io_max*io_load;
 	struct timespec		end;
 	int			i;
+
+	/* check the path to tempfile */	
+	if(strlen(io_tempfile) == 0){
+		sprintf(io_tempfile, "tempfile");
+	}
+
+	printf("ioloadgen: write to tempfile at %s\n", io_tempfile);
+	
 	printf("ioloadgen: write %llu bytes in %d seconds\n", expect_kbs, bytes, io_time);
+
 
 	/*create child process*/
 	for(i=0; i<1; i++){
@@ -22,7 +31,7 @@ void ioloadgen(){
 		if(*io_pid == 0){
 			signal(SIGUSR2, (__sighandler_t)exit_io_handler);
 			while(1){
-				file = fopen("/home/troy/tmp", "w");
+				file = fopen(io_tempfile, "w");
 				if(file == NULL) fprintf(stderr, "io: create temp file failed\n");
 				io_buffer = (char*)malloc(bytes*sizeof(char));
 
