@@ -72,7 +72,7 @@ int main(void){
 					}
 
 
-					double rate = ((double)(write_bytes - pre_write_bytes)/(double)time)/(double)1024;
+					double rate = ((double)(write_bytes - pre_write_bytes)/(double)time)/(double)(1024*2);
 					pre_write_bytes = write_bytes;
 					printf("%g kB/s\n", rate);
 					
