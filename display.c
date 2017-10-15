@@ -8,7 +8,7 @@ static pthread_t 	read_threads[3];
 static FILE *		mem_file;
 static double		mem_load;
 static unsigned long long mem_used, MemTotal;
-
+static int		io_max = 102400;
 
 static void dick(void);
 
@@ -36,7 +36,7 @@ void* display(void* none){
 			mvprintw(i+1, 3, "--------------------\n");
 			mvprintw(i+2, 3, "read: %.2lfkB/s\n ", node->read_rate);
 			mvprintw(i+3, 3, "write: %.2lfkB/s\n", node->write_rate);
-			mvprintw(i+4, 3, "total: %.2lfkB/s\n", node->total_rate);
+			mvprintw(i+4, 3, "total: %.2lfkB/s (%g%)\n", node->total_rate, (double)node->total_rate/(double)io_max);
 		}
 
 		dick();

@@ -37,9 +37,15 @@ clean:
 	-rm *.o
 	-rm -f *.out
 
-run:
+run_monitor:
 	make clean
 	make monitor
 	./monitor.out
 
+run_load:
+	make clean
+	make load
+	./workload -c 50 -m 50 -i 50 102400
 
+ioread:
+	gcc -o ioread.out ioread.c

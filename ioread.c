@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#define LEN 30
+
 static double diff_in_second(struct timespec t1, struct timespec t2)
 {
     struct timespec diff;
@@ -19,70 +21,73 @@ static double diff_in_second(struct timespec t1, struct timespec t2)
     return (diff.tv_sec + diff.tv_nsec / 1000000000.0);
 }
 
-void delete_file(){
-	int pid;
-	pid = fork();
-	if(pid == 0){
-		char *buf[] = {"rm", "-f", "/home/troy/tmp", 0};
-		execvp("rm", buf);
-	}
-}	
 
 int main(void){
-	int	i,pid;
-	FILE	*proc;
-	struct 	timespec start, end;
-	char	*buffer;
-	unsigned long long	bytes;
-	double	dtime;
+	int			i ,pid, major, minor, input_major = 8, input_minor = 0, time = 1, records;
+	FILE			*proc;
+	struct 	timespec 	start, end;
+	char			*buffer, name[20];
+	unsigned long long	pre_write_bytes = 0, write_bytes;
+	double			dtime;
+	double			list[LEN];
 
-	buffer = (char *)malloc(100*sizeof(char));
+	buffer = (char *)malloc(1000*sizeof(char));
 	
-	for(i = 0; i<1; i++){
-		pid = fork();
-		
-		memset(buffer, 0, 100);
-		sprintf(buffer,"/proc/%d/io", pid);
-		/*buffer[strlen(buffer)] = '\0';*/
-		clock_gettime(CLOCK_REALTIME, &start);
-		
-
-		if(pid < 0){
-			fprintf(stderr, "fork failed\n");
-		}
-		else if(pid == 0){
-			char *args[] = {"/usr/bin/dd", "if=/dev/zero", "of=/home/troy/tmp", "conv=fdatasync", 0};
-			int ret = execvp("/usr/bin/dd", args);
-			if(ret < 0) fprintf(stderr, "execvp failed\n");
-		}
-		
-		sleep(1);
-
-		clock_gettime(CLOCK_REALTIME, &end);
-		dtime = diff_in_second(start, end);
-
-		proc = fopen(buffer, "r");
-		if(proc == NULL) fprintf(stderr, "open proc file failed,  %s\n", (char *)strerror(errno));
-
-		fgets(buffer, 100, proc);
-		fgets(buffer, 100, proc);
-		fgets(buffer, 100, proc);
-		fgets(buffer, 100, proc);
-		fgets(buffer, 100, proc);
-
-		memset(buffer, 0, 100);
-		fgets(buffer, 100, proc);
-
-		sscanf(buffer, "write_bytes: %llu", &bytes);
-		double result = ((((double)bytes/dtime)/(double)1024.0)/(double)1024.0);	
-		/*printf("time: %lf\nbytes: %llu\n", dtime, bytes);*/
-		printf("write speed: %lfMb/s\n", result);
-
-		kill(pid, SIGTERM);
-		delete_file();
-		fclose(proc);
+	pid = fork();
+	
+	/* run dd command */
+	if(pid < 0){
+		fprintf(stderr, "fork failed\n");
+	}
+	else if(pid == 0){
+		char *args[] = {"/usr/bin/dd", "if=/dev/zero", "of=temp", "conv=fdatasync", 0};
+		int ret = execvp("/usr/bin/dd", args);
+		if(ret < 0) fprintf(stderr, "execvp failed\n");
 	}
 
+
+	clock_gettime(CLOCK_REALTIME, &start);
+
+	while(1){
+		
+		/* timer */
+		clock_gettime(CLOCK_REALTIME, &end);
+		dtime = diff_in_second(start, end);
+		if(dtime > 60){
+			free(buffer);
+			kill(pid, SIGTERM);
+			unlink("temp");
+			return 0;
+		}
+
+		proc = fopen("/proc/diskstats", "r");
+		if(proc == NULL) fprintf(stderr, "open proc file failed,  %s\n", (char *)strerror(errno));
+		while(fgets(buffer, 1000, proc) != NULL){
+				sscanf(buffer, "%d %d %s %*llu %*llu %*llu %*llu %*llu %*llu %llu", &major, &minor, name, &write_bytes);
+
+				if(major == input_major && minor == input_minor){
+					if(pre_write_bytes == 0){
+						pre_write_bytes = write_bytes;
+						break;
+					}
+
+
+					double rate = ((double)(write_bytes - pre_write_bytes)/(double)time)/(double)1024;
+					pre_write_bytes = write_bytes;
+					printf("%g kB/s\n", rate);
+					
+					break;
+
+				}
+		}
+
+		usleep(time*1000000);
+
+
+
+		fclose(proc);
+	}
 	free(buffer);
 }	
+
 
