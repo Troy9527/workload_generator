@@ -45,7 +45,7 @@ run_monitor:
 run_load:
 	make clean
 	make load
-	./workload -c 50 -m 50 -i 50 102400
+	./workload.out -c 50 -m 50 -i 50 153600
 
 ioread:
 	gcc -o ioread.out ioread.c

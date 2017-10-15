@@ -47,7 +47,10 @@ void ioloadgen(){
 				/* check write time*/
 				if(write_time > io_time*1000000){
 					fprintf(stderr, "writing time is too long\n");
-					exit(0);
+					/*exit(0);*/
+					free(io_buffer);
+					fclose(file);
+					continue;
 				}
 
 				int	sleep_time = (io_time*1000000 - write_time);

@@ -76,7 +76,7 @@ int main(void){
 					pre_write_bytes = write_bytes;
 					printf("%g kB/s\n", rate);
 					
-					break;
+					/*break;*/
 
 				}
 		}

@@ -79,10 +79,6 @@ int main(int argc, char* argv[]){
 					if(argv[i+3] != NULL){
 						strcpy(io_tempfile, argv[i+3]);
 					}
-					else{
-						usage();
-						return 0;
-					}
 
 
 					io_load = io_load/100.0;
